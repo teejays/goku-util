@@ -14,7 +14,7 @@ import (
 	"github.com/teejays/goku-util/panics"
 	"github.com/teejays/goku-util/scalars"
 	"github.com/teejays/goku-util/types"
-	"github.com/teejays/goku/generator/validate"
+	"github.com/teejays/goku-util/validate"
 )
 
 type EntityDALMetaBase[T types.BasicType, F types.Field] struct {

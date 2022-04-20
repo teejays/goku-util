@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 
 	"github.com/doug-martin/goqu/v9"
@@ -11,7 +12,6 @@ import (
 	"github.com/teejays/goku-util/errutil"
 	"github.com/teejays/goku-util/panics"
 	"github.com/teejays/goku-util/scalars"
-	"github.com/teejays/goku/generator/printer"
 )
 
 const SQL_DIALECT = "postgres"
@@ -254,7 +254,7 @@ type InsertBuilderRequest struct {
 }
 
 func (c Connection) ConstructInsertQuery(ctx context.Context, req InsertBuilderRequest) (string, []interface{}, error) {
-	clog.Debugf("Constructing Insert Query:\n%s", printer.PrettyPrint(req))
+	clog.Debugf("Constructing Insert Query:\n%s", PrettyPrint(req))
 
 	// Validate
 	if len(req.ColumnNames) < 1 {
@@ -307,7 +307,7 @@ type UpdateBuilderRequest struct {
 //  ConstructSelectQuery creates a string SQL query with args
 func (c Connection) ConstructUpdateQuery(ctx context.Context, req UpdateBuilderRequest) (string, []interface{}, error) {
 
-	clog.Debugf("Constructing Update Query:\n%s", printer.PrettyPrint(req))
+	clog.Debugf("Constructing Update Query:\n%s", PrettyPrint(req))
 
 	// Validate
 	if len(req.Columns) < 1 {
@@ -465,4 +465,10 @@ func SqlRowsToUUIDs(ctx context.Context, rows *sql.Rows) ([]scalars.ID, error) {
 		ids = append(ids, id)
 	}
 	return ids, nil
+}
+
+func PrettyPrint(i interface{}) string {
+	s, err := json.MarshalIndent(i, "", "\t")
+	panics.IfError(err, "Cannot json.MarshalIndent: %s", err)
+	return string(s)
 }
