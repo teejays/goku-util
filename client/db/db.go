@@ -60,6 +60,19 @@ func getConnectionString(o Options) (string, error) {
 		o.Host, o.Port, o.Database, o.User, o.SSLMode, "UTC"), nil
 }
 
+// CheckConnection ensures that the DB connection is established and working
+func CheckConnection(dbname string) error {
+	conn, err := NewConnection(dbname)
+	if err != nil {
+		return err
+	}
+	err = conn.DB.Ping()
+	if err != nil {
+		return fmt.Errorf("DB connection ping failed: %w", err)
+	}
+	return nil
+}
+
 // Connection (DB Connection) is a struct that will hold database connection details
 type Connection struct {
 	Dialect        string
