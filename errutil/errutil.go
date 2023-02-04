@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-
-	gopi "github.com/teejays/gopi"
 )
 
 var ErrNotFound = fmt.Errorf("not found")
@@ -32,21 +30,45 @@ func IsErrNoRows(err error) bool {
 }
 
 var ErrBadCredentials = GokuError{
-	internalError:      fmt.Errorf("bad credentials"),
-	externalError:      fmt.Errorf("Provided credentials did not match those on the system"),
+	externalMsg:        "Provided credentials did not match those on the system",
 	externalHTTPStatus: http.StatusUnauthorized,
 }
 
 var ErrBadToken = GokuError{
-	internalError:      fmt.Errorf("bad token"),
-	externalError:      fmt.Errorf("Provided authentication token cannot be verified"),
+	externalMsg:        "Provided authentication token cannot be verified",
 	externalHTTPStatus: http.StatusUnauthorized,
 }
 
 type GokuError struct {
 	internalError      error
-	externalError      error // if left empty, the internal message will be used
+	externalMsg        string // if left empty, the internal message will be used
 	externalHTTPStatus int
+}
+
+func NewGerror(code int, externalMessage string, msg string, args ...interface{}) error {
+	return GokuError{
+		internalError:      fmt.Errorf(msg, args...),
+		externalMsg:        externalMessage,
+		externalHTTPStatus: code,
+	}
+}
+
+func WrapGerror(err error, code int, externalMsg string) error {
+	if err == nil {
+		return nil
+	}
+	// Already Goku Error
+	if gerr, ok := err.(GokuError); ok {
+		gerr.externalMsg = externalMsg
+		gerr.externalHTTPStatus = code
+		return gerr
+	}
+	// Wrap in Goku Error
+	return GokuError{
+		internalError:      err,
+		externalMsg:        externalMsg,
+		externalHTTPStatus: code,
+	}
 }
 
 func (err GokuError) Error() string {
@@ -54,11 +76,11 @@ func (err GokuError) Error() string {
 }
 
 // GetHTTPStatus returns the status, if set, and defaults to InternalServerError
-func (err GokuError) GetExternalError() error {
-	if err.externalError != nil {
-		return err.externalError
+func (err GokuError) GetExternalMsg() string {
+	if err.externalMsg != "" {
+		return err.externalMsg
 	}
-	return err.internalError
+	return err.internalError.Error()
 }
 
 // GetHTTPStatus returns the status, if set, and defaults to InternalServerError
@@ -70,18 +92,24 @@ func (err GokuError) GetHTTPStatus() int {
 }
 
 func AsGokuError(err error) (GokuError, bool) {
-	if errors.Is(err, ErrBadCredentials) {
-		return ErrBadCredentials, true
-	}
-	return GokuError{}, false
-}
+	var gerr GokuError
 
-// HandleHTTPResponseError handles the logic that: if the error is a GokuError, get the right external stuff otherwise defaults to teh default message
-func HandleHTTPResponseError(w http.ResponseWriter, err error) {
-	if gErr, ok := AsGokuError(err); ok {
-		gopi.WriteError(w, gErr.GetHTTPStatus(), err, true, gErr.GetExternalError())
-		return
+	var inErr error = err
+	for {
+		if inGerr, ok := inErr.(GokuError); ok {
+			gerr = inGerr
+			break
+		}
+		inErr = errors.Unwrap(inErr)
+		if inErr == nil {
+			break
+		}
 	}
-	gopi.WriteError(w, http.StatusBadRequest, err, false, nil)
-	return
+
+	// If we found a Goku Error, and it has an external message, use it!
+	if gerr.internalError != nil {
+		return gerr, true
+	}
+
+	return GokuError{}, false
 }
