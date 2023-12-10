@@ -80,3 +80,7 @@ func GetUserID(ctx context.Context) (UserIDType, error) {
 func SetJWTToken(ctx context.Context, token string) context.Context {
 	return setValue(ctx, JWTTokenKey, token)
 }
+
+func GetJWTToken(ctx context.Context) (string, error) {
+	return getValue[string](ctx, JWTTokenKey)
+}
