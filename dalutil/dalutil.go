@@ -266,7 +266,7 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.C
 		return resp, errs
 	}
 
-	// Now that we have verified that caller provided fields are okay, we can add stuff to them to make them more usefull
+	// Now that we have verified that caller provided fields are okay, we can add stuff to them to make them more useful
 	// - Add NonMutable fields to ExcludeFields list
 	for _, f := range meta.GetDALMetaBase().NonMutableFields {
 		if !types.IsFieldInFields(f, excludeFields) {

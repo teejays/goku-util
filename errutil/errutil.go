@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/teejays/goku-util/panics"
 )
 
 var ErrNotFound = fmt.Errorf("not found")
@@ -29,10 +31,11 @@ func IsErrNoRows(err error) bool {
 	return err == sql.ErrNoRows
 }
 
-var ErrBadCredentials = GokuError{
-	externalMsg:        "Provided credentials did not match those on the system",
-	externalHTTPStatus: http.StatusUnauthorized,
-}
+var ErrBadCredentials = NewGerror(
+	http.StatusUnauthorized,
+	"Provided credentials did not match those on the system",
+	"",
+)
 
 var ErrBadToken = GokuError{
 	externalMsg:        "Provided authentication token cannot be verified",
@@ -40,17 +43,21 @@ var ErrBadToken = GokuError{
 }
 
 type GokuError struct {
-	internalError      error
-	externalMsg        string // if left empty, the internal message will be used
+	internalError      error  // optional:
+	externalMsg        string // optional: if left empty, the internal message will be used
 	externalHTTPStatus int
 }
 
 func NewGerror(code int, externalMessage string, msg string, args ...interface{}) error {
-	return GokuError{
+	err := GokuError{
 		internalError:      fmt.Errorf(msg, args...),
 		externalMsg:        externalMessage,
 		externalHTTPStatus: code,
 	}
+	if (err.internalError == nil || err.internalError.Error() == "") && err.externalMsg == "" && err.externalHTTPStatus == 0 {
+		panics.P("New Goku Error created with missing data")
+	}
+	return err
 }
 
 func WrapGerror(err error, code int, externalMsg string) error {
@@ -72,7 +79,10 @@ func WrapGerror(err error, code int, externalMsg string) error {
 }
 
 func (err GokuError) Error() string {
-	return err.internalError.Error()
+	if err.internalError != nil {
+		return err.internalError.Error()
+	}
+	return err.externalMsg
 }
 
 // GetHTTPStatus returns the status, if set, and defaults to InternalServerError

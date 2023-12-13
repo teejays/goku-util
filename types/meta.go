@@ -59,32 +59,32 @@ type Field interface {
 
 // PruneFields syncs the list of fields with the list of allowed and excluded fields
 func PruneFields[T Field](columns []T, includeFields []T, excludeFields []T) []T {
-	var newColumns []T
+	var includeFilteredColumns []T
 
 	// If include fields is provided, add those fields
 	if len(includeFields) > 0 {
 		for _, col := range columns {
 			if IsFieldInFields(col, includeFields) {
-				newColumns = append(newColumns, col)
+				includeFilteredColumns = append(includeFilteredColumns, col)
 			}
 		}
 	}
 
 	// If no include fields provided, assume everything is halal
 	if len(includeFields) < 1 {
-		newColumns = columns
+		includeFilteredColumns = columns
 	}
 
+	var excludedFilteredColumns []T
+
 	// If exclude fields is provided, remove those fields
-	if len(excludeFields) > 0 {
-		for i, col := range newColumns {
-			if IsFieldInFields(col, excludeFields) {
-				newColumns = append(newColumns[:i], newColumns[i+1:]...)
-			}
+	for _, col := range includeFilteredColumns {
+		if !IsFieldInFields(col, excludeFields) {
+			excludedFilteredColumns = append(excludedFilteredColumns, col)
 		}
 	}
 
-	return newColumns
+	return excludedFilteredColumns
 
 }
 
