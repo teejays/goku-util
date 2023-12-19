@@ -71,6 +71,7 @@ type ListTypeRequest[T types.FilterType] struct {
 
 type ListTypeResponse[T types.BasicType] struct {
 	Items []T
+	Count int
 	// MAYBE TODO: PageInfo interface{}
 }
 
@@ -280,7 +281,7 @@ func UpdateType[T types.BasicType, F types.Field](ctx context.Context, conn db.C
 		}
 	}
 
-	// Get Updateable Columns (taking field mask into account)
+	// Get Updatable Columns (taking field mask into account)
 	var cols = meta.GetDALMetaBase().DatabaseColumnFields
 	allowedCols := types.PruneFields(cols, fields, excludeFields)
 	if len(cols) < 1 {
