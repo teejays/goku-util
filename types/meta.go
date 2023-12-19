@@ -2,6 +2,7 @@ package types
 
 import (
 	"database/sql/driver"
+	"slices"
 	"time"
 
 	"github.com/teejays/goku-util/naam"
@@ -50,12 +51,13 @@ type Enum interface {
 	UnmarshalGraphQL(input interface{}) error
 }
 
+// Field is a generic constraint
+// Can also consider Field interface and FieldConstraint separately if needed.
 type Field interface {
+	comparable
 	String() string
 	Name() naam.Name
 }
-
-// Helper function
 
 // PruneFields syncs the list of fields with the list of allowed and excluded fields
 func PruneFields[T Field](columns []T, includeFields []T, excludeFields []T) []T {
@@ -64,14 +66,12 @@ func PruneFields[T Field](columns []T, includeFields []T, excludeFields []T) []T
 	// If include fields is provided, add those fields
 	if len(includeFields) > 0 {
 		for _, col := range columns {
-			if IsFieldInFields(col, includeFields) {
+			if slices.Contains(includeFields, col) {
 				includeFilteredColumns = append(includeFilteredColumns, col)
 			}
 		}
-	}
-
-	// If no include fields provided, assume everything is halal
-	if len(includeFields) < 1 {
+	} else {
+		// If no include fields provided, assume everything is halal
 		includeFilteredColumns = columns
 	}
 
@@ -89,12 +89,7 @@ func PruneFields[T Field](columns []T, includeFields []T, excludeFields []T) []T
 }
 
 func IsFieldInFields[T Field](column T, fields []T) bool {
-	for _, fld := range fields {
-		if fld.Name().Equal(column.Name()) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(fields, func(f T) bool { return f.Name().Equal(column.Name()) })
 }
 
 func RemoveFieldFromFields[T Field](column T, fields []T) []T {

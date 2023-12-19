@@ -8,119 +8,87 @@ import (
 	"github.com/teejays/goku-util/naam"
 )
 
-type SampleField int
+type TestField int
 
 const (
-	SampleField_INVALID SampleField = 0
-	SampleField_1       SampleField = 1
-	SampleField_2       SampleField = 2
-	SampleField_3       SampleField = 3
+	TestField_INVALID TestField = 0
+	TestField_1       TestField = 1
+	TestField_2       TestField = 2
+	TestField_3       TestField = 3
 )
 
-func (f SampleField) String() string {
+func (f TestField) String() string {
 	switch f {
-	case SampleField_INVALID:
+	case TestField_INVALID:
 		return "INVALID"
-	case SampleField_1:
+	case TestField_1:
 		return "1"
-	case SampleField_2:
+	case TestField_2:
 		return "2"
-	case SampleField_3:
+	case TestField_3:
 		return "3"
 	default:
-		panic(fmt.Sprintf("'%d' is not a valid type '%s'", f, "SampleField"))
+		panic(fmt.Sprintf("'%d' is not a valid type '%s'", f, "TestField"))
 	}
 }
 
-func (f SampleField) Name() naam.Name {
+func (f TestField) Name() naam.Name {
 	switch f {
-	case SampleField_INVALID:
+	case TestField_INVALID:
 		return naam.New("INVALID")
-	case SampleField_1:
+	case TestField_1:
 		return naam.New("1")
-	case SampleField_2:
+	case TestField_2:
 		return naam.New("2")
-	case SampleField_3:
+	case TestField_3:
 		return naam.New("3")
 	default:
-		panic(fmt.Sprintf("'%d' is not a valid type '%s'", f, "SampleField"))
+		panic(fmt.Sprintf("'%d' is not a valid type '%s'", f, "TestField"))
 	}
 }
-
-func (f SampleField) ToDatabaseColumn() string {
-	switch f {
-	case SampleField_INVALID:
-		return "invalid"
-	case SampleField_1:
-		return "one"
-	case SampleField_2:
-		return "two"
-	case SampleField_3:
-		return "three"
-	default:
-		panic(fmt.Sprintf("'%d' is not a valid type '%s'", f, "SampleField"))
-	}
-}
-
-// // Value implements them the `drive.Valuer` interface for this enum. It allows us to save these enum values to the DB as a string.
-// func (f SampleField) Value() (driver.Value, error) {
-// 	switch f {
-// 	case SampleField_INVALID:
-// 		return nil, nil
-// 	case SampleField_1:
-// 		return "1", nil
-// 	case SampleField_2:
-// 		return "2", nil
-// 	case SampleField_3:
-// 		return "3", nil
-
-// 	default:
-// 		return nil, fmt.Errorf("Cannot save enum SampleField to DB: '%d' is not a valid value for enum SampleField", f)
-// 	}
-// }
 
 func TestPruneFields(t *testing.T) {
 	tests := []struct {
 		name          string
-		columns       []Field
-		includeFields []Field
-		excludeFields []Field
-		want          []Field
+		columns       []TestField
+		includeFields []TestField
+		excludeFields []TestField
+		want          []TestField
 	}{
 		{
 			name:          "No fields provided",
-			columns:       []Field{},
-			includeFields: []Field{},
-			excludeFields: []Field{},
-			want:          []Field{},
+			columns:       []TestField{},
+			includeFields: []TestField{},
+			excludeFields: []TestField{},
+			want:          []TestField{},
 		},
 		{
 			name:          "All cols with no include or exclude fields - all should be used",
-			columns:       []Field{SampleField_1, SampleField_2, SampleField_3},
-			includeFields: []Field{},
-			excludeFields: []Field{},
-			want:          []Field{SampleField_1, SampleField_2, SampleField_3},
+			columns:       []TestField{TestField_1, TestField_2, TestField_3},
+			includeFields: []TestField{},
+			excludeFields: []TestField{},
+			want:          []TestField{TestField_1, TestField_2, TestField_3},
 		},
 		{
 			name:          "All cols with one include field and no exclude fields - one should be used",
-			columns:       []Field{SampleField_1, SampleField_2, SampleField_3},
-			includeFields: []Field{SampleField_2},
-			excludeFields: []Field{},
-			want:          []Field{SampleField_2},
+			columns:       []TestField{TestField_1, TestField_2, TestField_3},
+			includeFields: []TestField{TestField_2},
+			excludeFields: []TestField{},
+			want:          []TestField{TestField_2},
 		},
 		{
 			name:          "All cols with no include field and one exclude fields - all but one should be used",
-			columns:       []Field{SampleField_1, SampleField_2, SampleField_3},
-			includeFields: []Field{},
-			excludeFields: []Field{SampleField_2},
-			want:          []Field{SampleField_1, SampleField_3},
+			columns:       []TestField{TestField_1, TestField_2, TestField_3},
+			includeFields: []TestField{},
+			excludeFields: []TestField{TestField_2},
+			want:          []TestField{TestField_1, TestField_3},
 		},
 		{
 			name:          "All cols with two include field and one exclude fields - two but one should be used",
-			columns:       []Field{SampleField_1, SampleField_2, SampleField_3},
-			includeFields: []Field{SampleField_1, SampleField_2},
-			excludeFields: []Field{SampleField_2},
-			want:          []Field{SampleField_1},
+			columns:       []TestField{TestField_1, TestField_2, TestField_3},
+			includeFields: []TestField{TestField_1, TestField_2},
+			excludeFields: []TestField{TestField_2},
+			want:          []TestField{TestField_1},
 		},
 	}
 	for _, tt := range tests {

@@ -1,6 +1,6 @@
 module github.com/teejays/goku-util
 
-go 1.18
+go 1.21
 
 require (
 	github.com/doug-martin/goqu/v9 v9.18.0
