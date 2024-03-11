@@ -1,0 +1,21 @@
+go 1.22.0
+
+use (
+	// all dirs in this package
+	./client/db
+	./clog
+	./ctxutil
+	./dalutil
+	./env
+	./errutil
+	./filter
+	./gopi
+	./httputil
+	./jwt
+	./log
+	./naam
+	./scalars
+	./strcase
+	./types
+	./validate
+)

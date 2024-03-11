@@ -18,6 +18,10 @@ func NewID() ID {
 	return ID{uuid.New()}
 }
 
+func NewStaticID(hash string) ID {
+	return ID{uuid.New()}
+}
+
 func ParseID(s string) (ID, error) {
 	uid, err := uuid.Parse(s)
 	if err != nil {

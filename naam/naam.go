@@ -53,9 +53,11 @@ func Join(sep string, names ...Name) Name {
 // Less is a helper function that helps sort an array of Names.
 // Example usage:
 // ```
-// 		sort.Slice( sliceOfNames, func(i, j int) bool {
-// 			return naam.Less(app.Services[i].Name, app.Services[j].Name)
-//		})
+//
+//	sort.Slice( sliceOfNames, func(i, j int) bool {
+//		return naam.Less(app.Services[i].Name, app.Services[j].Name)
+//	})
+//
 // ```
 func Less(a, b Name) bool {
 	return a.clean().words < b.clean().words
