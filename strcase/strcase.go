@@ -19,7 +19,7 @@ var acronyms = map[string]bool{
 }
 
 func init() {
-	// NOte: Not sure if this even works. Our own Acronyms work better
+	// Note: Not sure if this even works. Our own Acronyms work better
 	for k, v := range acronyms {
 		if !v {
 			continue
@@ -137,6 +137,7 @@ var pluralOverrides = map[string]string{
 	"sheep":   "sheep",
 	"fish":    "fish",
 	"address": "addresses",
+	"process": "processes",
 }
 
 func Pluralize(s string) string {
