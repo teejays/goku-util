@@ -162,6 +162,7 @@ var singularOverrides = map[string]string{
 	"sheep":     "sheep",
 	"fish":      "fish",
 	"addresses": "address",
+	"processes": "process",
 }
 
 func Singularize(s string) string {
@@ -174,6 +175,6 @@ func Singularize(s string) string {
 	if s[len(s)-1] == 's' {
 		return s[:len(s)-1]
 	}
-	panics.P("library strcase: couldn't determine signular form of '%s'", s)
+	panics.P("library strcase: couldn't determine singular form of '%s'", s)
 	return s
 }

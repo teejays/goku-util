@@ -1,4 +1,4 @@
-module github.com/teejays/goku-util/client
+module github.com/teejays/goku-util/client/db
 
 go 1.22.0
 

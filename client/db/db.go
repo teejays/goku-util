@@ -214,7 +214,7 @@ func (c Connection) GetSQLConnection() SQLConnection {
 	return c.DB
 }
 
-//  ExecuteQuery executes an insert or update query, returning the number of rows affected.
+// ExecuteQuery executes an insert or update query, returning the number of rows affected.
 func (c Connection) ExecuteQuery(ctx context.Context, query string, args ...interface{}) (int64, error) {
 
 	clog.Debugf("Executing Query: \n"+query, args...)
@@ -317,7 +317,7 @@ type UpdateBuilderRequest struct {
 	ID scalars.ID
 }
 
-//  ConstructSelectQuery creates a string SQL query with args
+// ConstructSelectQuery creates a string SQL query with args
 func (c Connection) ConstructUpdateQuery(ctx context.Context, req UpdateBuilderRequest) (string, []interface{}, error) {
 
 	clog.Debugf("Constructing Update Query:\n%s", PrettyPrint(req))
@@ -361,7 +361,7 @@ type SelectByIDBuilderRequest struct {
 	IDs      []scalars.ID
 }
 
-//  ConstructSelectQuery creates a string SQL query with args
+// ConstructSelectQuery creates a string SQL query with args
 func (c Connection) ConstructSelectByIDQuery(ctx context.Context, req SelectByIDBuilderRequest) (string, []interface{}, error) {
 
 	// Validate
