@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	_ "fmt"
+
 	"github.com/teejays/goku-util/panics"
 	"github.com/teejays/goku-util/strcase"
 )

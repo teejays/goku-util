@@ -1,6 +1,6 @@
 module github.com/teejays/goku-util/client/db
 
-go 1.22.0
+go 1.22.1
 
 require (
 	github.com/doug-martin/goqu/v9 v9.19.0
