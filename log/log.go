@@ -16,9 +16,10 @@ func Init() {
 		Can split the logging functionality based on env: env.PROD, env.STG, env.DEV
 	*/
 	case env.PROD:
-		logger = slog.New(slog.NewJSONHandler(os.Stderr, nil))
+		logger = slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{}))
 	default:
 		logger = slog.Default()
+		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 }
 
@@ -26,7 +27,7 @@ func Debug(ctx context.Context, msg string, args ...interface{}) {
 	logger.DebugContext(ctx, msg, args...)
 }
 
-func Info(ctx context.Context, msg string, args ...interface{}) {
+func Info(ctx context.Context, msg string, args ...any) {
 	logger.InfoContext(ctx, msg, args...)
 }
 

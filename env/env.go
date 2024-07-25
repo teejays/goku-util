@@ -2,8 +2,6 @@ package env
 
 import (
 	"os"
-
-	"github.com/teejays/goku-util/panics"
 )
 
 type Environment int
@@ -36,6 +34,8 @@ func Init() {
 }
 
 func GetEnv() Environment {
-	panics.If(!isInitialized, "env.GetEnv() called env package being initialized")
+	if !isInitialized {
+		Init()
+	}
 	return env
 }
