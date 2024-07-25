@@ -50,6 +50,11 @@ func TestNewName(t *testing.T) {
 			words: "user__x__name",
 			want:  Name{words: "user__x__name"},
 		},
+		{
+			name:  "8",
+			words: "PersonName",
+			want:  Name{words: "person_name"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -135,7 +140,7 @@ func TestUnmarshalJSON(t *testing.T) {
 	}{
 		{
 			name:    "Sample Test",
-			data:    []byte(`"Sample App"`),
+			data:    []byte(`Sample App`),
 			want:    Name{words: "sample_app"},
 			wantErr: false,
 		},

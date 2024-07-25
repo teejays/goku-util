@@ -26,8 +26,9 @@ type Name struct {
 
 // New creates a new name. The input string can be free form
 func New(words string) Name {
-	n := Name{words: words}
-	return n.clean()
+	n := Name{}
+	n.ParseString(words)
+	return n
 }
 
 // Nil provides an empty Name, useful to compare and figure out if a Name is empty
@@ -92,14 +93,23 @@ func (s Name) MarshalJSON() ([]byte, error) {
 
 // MarshalJSON implements the `json.Unmarshaler` interface, so strings in JSON can easily converted to Name.
 func (s *Name) UnmarshalJSON(b []byte) error {
-	var words string
-	err := json.Unmarshal(b, &words)
-	if err != nil {
+	s.ParseString(string(b))
+	return nil
+}
+
+func (s *Name) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var str string
+	if err := unmarshal(&str); err != nil {
 		return err
 	}
-	words = cleanWords(words)
-	s.words = words
+	s.ParseString(str)
 	return nil
+}
+
+// ParseString is a helper function that parses a string into a Name.
+func (s *Name) ParseString(str string) {
+	words := cleanWords(str)
+	s.words = words
 }
 
 // MarshalText implements in the `encoding.TextMarshaler` interface.

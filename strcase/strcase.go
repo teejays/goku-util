@@ -5,26 +5,31 @@ import (
 
 	"github.com/iancoleman/strcase"
 	"github.com/teejays/goku-util/panics"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
-var acronyms = map[string]bool{
-	"ID":   true,
-	"UUID": true,
-	"UI":   true,
-	"DAL":  true,
-	"USA":  true,
-	"HTTP": true,
-	"API":  true,
-	"JWT":  true,
+var acronyms = []string{
+	"HTTP",
+	"UUID",
+	"API",
+	"DAL",
+	"JWT",
+	"USA",
+	"ID",
+	"UI",
 }
+
+var acronymsLookup map[string]bool
 
 func init() {
 	// Note: Not sure if this even works. Our own Acronyms work better
-	for k, v := range acronyms {
-		if !v {
-			continue
-		}
-		strcase.ConfigureAcronym(k, strings.ToLower(k))
+	for _, v := range acronyms {
+		strcase.ConfigureAcronym(v, strings.ToLower(v))
+	}
+	acronymsLookup = map[string]bool{}
+	for _, v := range acronyms {
+		acronymsLookup[v] = true
 	}
 }
 
@@ -32,12 +37,12 @@ func IsEqual(a, b string) bool {
 	return strings.EqualFold(a, b)
 }
 func IsAcronym(s string) bool {
-	return acronyms[strings.ToUpper(s)]
+	return acronymsLookup[strings.ToUpper(s)]
 }
 
 func HasAcronym(s string) bool {
-	for acr, is := range acronyms {
-		if is && strings.Contains(s, acr) {
+	for _, acr := range acronyms {
+		if strings.Contains(s, acr) {
 			return true
 		}
 	}
@@ -46,10 +51,7 @@ func HasAcronym(s string) bool {
 
 // UpperizeAcronym - only upperize if the prefix or suffix is an Acronym
 func UpperizeAcronym(s string) string {
-	for acr, is := range acronyms {
-		if !is {
-			continue
-		}
+	for _, acr := range acronyms {
 		// Can't match if string is smaller than the acronym
 		if len(s) < len(acr) {
 			continue
@@ -111,15 +113,15 @@ func ToLowerCamel(s string) string {
 	return s
 }
 
+// ToSnake - converts a string to snake_case
 func ToSnake(s string) string {
-	for acronym, active := range acronyms {
-		if !active {
-			continue
-		}
+	for _, acr := range acronyms {
 		// If there is an uppercase acronym XYZ in here, make it title case since strcase thinks x, y, and z in XYX are seperate words
-		replace := strings.ToUpper(acronym)
-		with := strings.Title(strings.ToLower(acronym))
-		s = strings.ReplaceAll(s, replace, with)
+		replace := strings.ToUpper(acr)
+		if strings.Contains(s, replace) {
+			with := cases.Title(language.English).String(strings.ToLower(acr))
+			s = strings.ReplaceAll(s, replace, with)
+		}
 	}
 	// if there are three `_`, we should maintain them as two `_` in snake case
 	parts := strings.Split(s, PartsSep)
