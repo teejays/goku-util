@@ -4,7 +4,7 @@ go 1.22.1
 
 require (
 	github.com/stretchr/testify v1.9.0
-	github.com/teejays/clog v0.0.0-20240220020944-ff31c9bb7d85
+	github.com/teejays/clog v0.0.0-20240330223723-2114569c05a4
 )
 
 require (
